@@ -7,6 +7,7 @@ CONTAINER_NAME="osint-liar-api"
 IMAGE_NAME="osintliar/osint-liar-api:latest"
 PORT=9906
 FIXED_IP="192.168.100.100"
+VOLUME_NAME="osint_liar_home"
 
 # Check if the network already exists, if not, create it
 docker network ls | grep -q "$NETWORK_NAME"
@@ -23,7 +24,9 @@ read -p "Enter comma-separated email addresses for USERS environment variable: "
 # Run the Docker container
 echo "Pulling the latest Docker image..."
 docker pull $IMAGE_NAME
-
+# remove the old container
+docker stop $CONTAINER_NAME || true
+docker rm $CONTAINER_NAME || true
 echo "Starting the Docker container..."
 docker run -d \
   --name=$CONTAINER_NAME \
@@ -31,6 +34,7 @@ docker run -d \
   --ip=$FIXED_IP \
   -p $PORT:$PORT \
   -e USERS="$USERS" \
+  -v $VOLUME_NAME:/home/lia \
   $IMAGE_NAME
 
 if [ $? -eq 0 ]; then
