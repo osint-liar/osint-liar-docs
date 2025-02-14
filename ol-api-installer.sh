@@ -44,8 +44,10 @@ echo "Ensuring compatibility across platforms..."
 if [[ "$OSTYPE" == "darwin"* ]]; then
     echo "Running on macOS"
 elif [[ "$OSTYPE" == "linux"* ]]; then
-    echo "Running on Linux"\elif [[ "$OSTYPE" == "msys"* || "$OSTYPE" == "cygwin"* ]]; then
+    echo "Running on Linux"
+elif [[ "$OSTYPE" == "msys"* || "$OSTYPE" == "cygwin"* ]]; then
     echo "Running on Windows"
 else
     echo "Unsupported platform"
 fi
+
