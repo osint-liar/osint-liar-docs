@@ -13,9 +13,18 @@ VOLUME_NAME="osint_liar_home"
 docker network ls | grep -q "$NETWORK_NAME"
 if [ $? -ne 0 ]; then
     echo "Creating Docker network: $NETWORK_NAME with subnet $SUBNET"
-    docker network create --subnet=$SUBNET $NETWORK_NAME
+    docker network create --subnet=$SUBNET --gateway=192.168.100.1 $NETWORK_NAME
 else
     echo "Docker network $NETWORK_NAME already exists."
+fi
+
+# Check if the volume already exists, if not, create it
+docker volume ls | grep -q "$VOLUME_NAME"
+if [ $? -ne 0 ]; then
+    echo "Creating Docker volume: $VOLUME_NAME for persisted home directory"
+    docker volume create $VOLUME_NAME
+else
+    echo "Docker volume $VOLUME_NAME already exists."
 fi
 
 # Prompt for email addresses
@@ -24,9 +33,11 @@ read -p "Enter comma-separated email addresses for USERS environment variable: "
 # Run the Docker container
 echo "Pulling the latest Docker image..."
 docker pull $IMAGE_NAME
+
 # remove the old container
 docker stop $CONTAINER_NAME || true
 docker rm $CONTAINER_NAME || true
+
 echo "Starting the Docker container..."
 docker run -d \
   --name=$CONTAINER_NAME \
@@ -35,6 +46,7 @@ docker run -d \
   -p $PORT:$PORT \
   -e USERS="$USERS" \
   -v $VOLUME_NAME:/home/lia \
+  --add-host=host.docker.internal:host-gateway \
   $IMAGE_NAME
 
 if [ $? -eq 0 ]; then
