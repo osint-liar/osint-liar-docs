@@ -47,7 +47,7 @@ docker run -d \
   -e USERS="$USERS" \
   -v $VOLUME_NAME:/home/lia \
   --add-host=host.docker.internal:host-gateway \
-  $IMAGE_NAME
+  $IMAGE_NAME --web-host-url=http://*:9906/
 
 if [ $? -eq 0 ]; then
     echo "OSINT LIAR API container started successfully. Access it at http://$FIXED_IP:$PORT."
